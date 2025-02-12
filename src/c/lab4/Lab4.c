@@ -1,5 +1,5 @@
 ﻿/*
-N -натуральных чисел являются элементами двунаправленного списка L, вычислить: X1*Xn+X2*Xn-1+...+Xn*X1. 
+N -натуральных чисел являются элементами двунаправленного списка L, вычислить: X1*Xn+X2*Xn-1+...+Xn*X1.
 Вывести на экран каждое произведение и итоговую сумму.
 */
 #define _CRT_SECURE_NO_WARNINGS
@@ -15,29 +15,42 @@ struct Node {
 	Node* prev;
 };
 
-void printNode(Node* node) {
-	printf("%d -> %d -> %d", 
-		node->prev == NULL ? -1 : node->prev->value,
-		node->value, 
-		node->next == NULL ? -1 : node->next->value);
+Node buffer[1000];
+
+void printBuffer(Node* from) {
+	Node* n = from;
+	while(1) {
+		//printf("%d ", n->value);
+		printf("%d ",n->value);
+		//printf("[%d,%d,%d]", buffer[n.prev].value, n.value, buffer[n.next].value);
+		n = n->next;
+		if (n == from) break;
+	}
+	printf("\n");
 }
+
 
 int main() {
 	int n = 10;
+	printf("Enter seq size:\n");
 	scanf("%d", &n);
-
-	Node tmp = { 0 };
+	printf("Enter seq elements:\n");
+	Node tmp = buffer[0];
 	tmp.value = 0;
 	Node* current = &tmp;
 	scanf("%d", &current->value);
 	current->next = &tmp;
 	current->prev = &tmp;
+	printf("Current seq: ");
+	printBuffer(current);
 	for (int i = 1; i < n; i++) {
-		Node* insert = malloc(sizeof(Node));
+		Node* insert = &buffer[i];
 		scanf("%d", &insert->value);
 		insert->next = current->next;
 		current->next = insert;
 		insert->prev = current;
+		printf("Current seq: ");
+		printBuffer(current);
 		current = insert;
 	}
 	tmp.prev = current;
