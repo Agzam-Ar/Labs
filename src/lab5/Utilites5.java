@@ -30,6 +30,7 @@ public class Utilites5 {
 			}
 		}
 		int shift = (int) ((Math.ceil(Math.log(x1l+1) / Math.log(2)))-a);
+		System.out.println("Shift: " + shift);
 		if(shift > ((1L << (exponentLength-1))-1)) {
 			System.out.println(result[0] + "111110000000000");
 		} else {
@@ -40,6 +41,7 @@ public class Utilites5 {
 			for (int i = 0; exponentLength + i + 1 + shift < resultLength; i++) {
 				x1r *= 2;
 				int num = x1r/mul;
+				System.out.println(num + " = " + x1r + "/" + mul);
 				x1r -= num*mul;
 				if(x1l == 0) shift--;
 				if(num == 1) x1l = 1;
@@ -50,6 +52,7 @@ public class Utilites5 {
 			if(shift < 0) {
 				System.out.println(result[0] + "000000000000000");
 			} else {
+				System.out.println("Shift3: " + shift);
 				for (int i = 0; i < exponentLength; i++)
 					if(((1 << i) & shift) == 0) result[exponentLength-i] = 0;
 					else result[exponentLength-i] = 1;
