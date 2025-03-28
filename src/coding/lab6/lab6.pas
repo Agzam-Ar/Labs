@@ -30,6 +30,9 @@ procedure draw(); begin
     transforms[3] := -sin(camAngle)*camZoom;
     transforms[4] :=  sin(camAngle)*camZoom;
     transforms[5] :=  cos(camAngle)*camZoom;
+    
+    if transforms[0] < 0 then transforms[0] := 0;
+    
     ClearWindow();
     drawFractal(deepth);
     lockDraw := false;
