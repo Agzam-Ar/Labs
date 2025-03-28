@@ -1,5 +1,3 @@
-
-
 typedef struct LinkedList {
 
 	struct LinkedListNode* current;
@@ -16,12 +14,10 @@ typedef struct LinkedListNode {
 
 LinkedList* create();
 
-//LinkedListNode* createList();
 void append(LinkedList* list, char* arg);
 void prepend(LinkedList* list, char* arg);
 void lremove(LinkedList* list, char* arg);
 void next(LinkedList* list, char* arg);
 void previous(LinkedList* list, char* arg);
-
-
-void printList(LinkedList* list);
+void printList(LinkedList* list, char* arg);
+void clear(LinkedList* list, char* arg);

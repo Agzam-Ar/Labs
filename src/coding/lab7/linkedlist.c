@@ -11,24 +11,24 @@ LinkedList* create() {
 	node->next = node;
 	node->prev = node;*/
 
-	LinkedList* list = (LinkedList*) malloc(sizeof(LinkedList));
+	LinkedList* list = (LinkedList*)malloc(sizeof(LinkedList));
 	list->current = NULL;
 	return list;
 }
 
 
-void printList(LinkedList* list) {
-	printf("Current state:\n");
+void printList(LinkedList* list, char* arg) {
+	printf("Current state:\033[0m\n");
 	LinkedListNode* first = list->current;
 	if (first == NULL) {
-		printf("<empty>\n");
+		printf("\033[90m<empty>\033[0m\n");
 		return;
 	}
 
-	printf("-[%s]\n", first->value);
+	printf("\033[90m- \033[34m%s\033[0m\n", first->value);
 	LinkedListNode* current = first->next;
 	while (first != current) {
-		printf("- %s\n", current->value);
+		printf("\033[90m- \033[0m%s\n", current->value);
 		current = current->next;
 	}
 }
@@ -84,5 +84,10 @@ void next(LinkedList* list, char* arg) {
 void previous(LinkedList* list, char* arg) {
 	if (list->current == NULL) return;
 	list->current = list->current->prev;
+}
+
+
+void clear(LinkedList* list, char* arg) {
+	while (list->current != NULL) lremove(list, arg);
 }
 

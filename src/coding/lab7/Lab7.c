@@ -6,25 +6,35 @@
 #include "linkedlist.h"
 #include "string.h"
 
-#define bufferSize 10
+#define bufferSize 20
 #define vk_up 72
 #define vk_down 80
 
 typedef void listener(LinkedList* list, char*);
 
-char* commands[] = { "append", "prepend", "remove","next", "previous", "help" };
-int* arguments[] = { 1,1,0,0,0,0 };
+char* commands[] = { "append", "prepend", "remove","next", "previous", "help", "list", "clear" };
+char* desc[] = { 
+	"append <arg> element after current", 
+	"prepend <arg> element before current", 
+	"remove current element",
+	"move index to next element", 
+	"move index to previous element", 
+	"show list of avalible commands",
+	"show list elements", 
+	"clearing all elements in list" 
+};
+int* arguments[] = { 1,1,0,0,0,0,0 };
 
 void help(LinkedListNode* node, char* arg) {
 	printf("Avalible commands:\n");
 	for (int i = 0; i < sizeof(commands) / sizeof(char*); i++) {
-		if(arguments[i]) printf("- %s <arg>\n", commands[i]);
-		else printf("- %s\n", commands[i]);
+		if (arguments[i]) printf("- %s <arg> \033[90m%s\033[0m\n", commands[i], desc[i]);
+		else printf("- %s \033[90m%s\033[0m\n", commands[i], desc[i]);
 	}
 	printf("\n");
 }
 
-listener* listeners[] = {  append,   prepend,  lremove,  next,   previous, help};
+listener* listeners[] = { append,   prepend,  lremove,  next, previous, help, printList, clear };
 
 int sizes[sizeof(commands) / sizeof(char*)];
 char buffer[bufferSize];
@@ -57,8 +67,8 @@ int startsWithCmd() {
 	for (int i = 0; i < sizeof(commands) / sizeof(char*); i++) {
 		char* cmd = commands[i];
 		char valid = 1;
-		if (bufferIndex < sizes[i]-1) continue;
-		for (int x = 0; x < sizes[i]-1; x++) {
+		if (bufferIndex < sizes[i] - 1) continue;
+		for (int x = 0; x < sizes[i] - 1; x++) {
 			if (cmd[x] != buffer[x]) {
 				valid = 0;
 				break;
@@ -85,7 +95,7 @@ int main() {
 	for (int i = 0; i < sizeof(commands) / sizeof(char*); i++) {
 		for (sizes[i] = 0; commands[i][sizes[i]]; sizes[i]++);
 	}
-	printf(">");
+	printf("\033[34m>\033[0m");
 	int mode = 0;
 	while (1) {
 		char key = _getch();
@@ -119,37 +129,40 @@ int main() {
 			printf("\n");
 			int ci = startsWithCmd();
 
-			char* bufferCpy = malloc(sizeof(char) * (bufferIndex+1));
+			char* bufferCpy = malloc(sizeof(char) * (bufferIndex + 1));
 			for (int i = 0; i < bufferIndex; i++) bufferCpy[i] = buffer[i];
 			bufferCpy[bufferIndex] = '\0';
 
 			if (ci == -1) {
-				printf("Unknown command\n");
-			} else {
+				printf("\033[31mUnknown command\033[0m\n");
+			}
+			else {
 				int argLength = (bufferIndex - sizes[ci] - 1);
 				if (arguments[ci] && argLength <= 0) {
-					printf("Command requires arguments\n");
-				} else if (!arguments[ci] && argLength >= 0) {
-					printf("Too many arguments\n");
-				} else {
+					printf("\033[31mCommand requires arguments\033[0m\n");
+				}
+				else if (!arguments[ci] && argLength >= 0) {
+					printf("\033[31mToo many arguments\033[0m\n");
+				}
+				else {
 					if (argLength > 0) {
 						char* arg = malloc(sizeof(char) * (argLength + 1));
 						for (int i = 0; i < argLength; i++) arg[i] = buffer[sizes[ci] + i + 1];
 						arg[argLength] = '\0';
-						printf("Executing command %s\(\"%s\")\n", commands[ci], arg);
+						printf("Executing command \033[92m%s\(\"%s\")\033[0m\n", commands[ci], arg);
 						listeners[ci](list, arg);
-					} else {
-						printf("Executing command %s()\n", commands[ci]);
+					}
+					else {
+						printf("Executing command \033[92m%s()\033[0m\n", commands[ci]);
 						listeners[ci](list, "");
 					}
-					printList(list);
 				}
 			}
 			append(history, bufferCpy);
 			next(history, NULL);
 			currentHistory = history->current;
 
-			printf(">");
+			printf("\033[34m>\033[0m");
 			bufferIndex = 0;
 			continue;
 		}
