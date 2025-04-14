@@ -35,3 +35,5 @@ replay_pid*
 *.0
 *.exe
 *.ico
+src/coding/lab8/a
+*.bin
