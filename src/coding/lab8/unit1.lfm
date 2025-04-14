@@ -1,0 +1,103 @@
+object Form1: TForm1
+  Left = 1435
+  Height = 358
+  Top = 356
+  Width = 421
+  Caption = 'Form1'
+  ClientHeight = 358
+  ClientWidth = 421
+  OnCreate = FormCreate
+  LCLVersion = '3.8.0.0'
+  object Button1: TButton
+    Left = 8
+    Height = 25
+    Top = 8
+    Width = 75
+    Caption = 'Create file'
+    TabOrder = 0
+    OnClick = onClickCreateFile
+  end
+  object Button2: TButton
+    Left = 8
+    Height = 25
+    Top = 40
+    Width = 75
+    Caption = 'Select'
+    TabOrder = 1
+    OnClick = onClickSelectFile
+  end
+  object pageInput: TEdit
+    Left = 128
+    Height = 23
+    Top = 320
+    Width = 128
+    MaxLength = 11
+    NumbersOnly = True
+    TabOrder = 2
+    Text = '1'
+    OnChange = onPageChange
+  end
+  object Label1: TLabel
+    Left = 88
+    Height = 15
+    Top = 320
+    Width = 29
+    Caption = 'Page:'
+  end
+  object fileViewer: TMemo
+    Left = 88
+    Height = 304
+    Top = 8
+    Width = 318
+    Enabled = False
+    Lines.Strings = (
+      'fileViewer'
+    )
+    TabOrder = 3
+  end
+  object sortButton: TButton
+    Left = 8
+    Height = 25
+    Top = 72
+    Width = 75
+    Caption = 'Sort'
+    TabOrder = 4
+    OnClick = onClickSort
+  end
+  object checkButton: TButton
+    Left = 8
+    Height = 25
+    Top = 104
+    Width = 75
+    Caption = 'Check'
+    TabOrder = 5
+    OnClick = onClickCheck
+  end
+  object modeSelect: TComboBox
+    Left = 8
+    Height = 23
+    Top = 136
+    Width = 76
+    DropDownCount = 4
+    ItemHeight = 15
+    ItemIndex = 0
+    Items.Strings = (
+      'group'
+      'course'
+      'corpus'
+      'region'
+    )
+    TabOrder = 6
+    Text = 'group'
+    OnChange = onModeSelect
+  end
+  object createFileDialog: TSaveDialog
+    Title = 'Create file'
+    Left = 344
+    Top = 48
+  end
+  object openDialog: TOpenDialog
+    Left = 359
+    Top = 118
+  end
+end

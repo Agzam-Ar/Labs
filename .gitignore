@@ -27,3 +27,11 @@ replay_pid*
 *.prefs
 *.bkp
 /bin/
+/src/coding/lab8/lib
+/src/coding/lab8/backup
+*.3
+*.2
+*.1
+*.0
+*.exe
+*.ico
