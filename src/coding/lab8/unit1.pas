@@ -9,7 +9,7 @@ uses
  
 
 const
-  bufferSize = 20;//1024 * 1024 * 16;
+  bufferSize = 1024 * 1024 * 16;
   pageSize = 20;
 
 type
@@ -115,7 +115,12 @@ implementation
 {$R *.lfm}
 
 { TForm1 }
-      
+
+function getFieldMode(value, mode:user):longint;
+begin
+     getFieldMode := (value shr (mode*8)) and 255;
+end;
+
 function getField(value:user):longint;
 begin
      getField := (value shr (mode*8)) and 255;
@@ -126,29 +131,12 @@ begin
  if createFileDialog.Execute then begin
       AssignFile(myfile, createFileDialog.FileName);
       Rewrite(myfile);
-      //CloseFile(myfile);
-      //
-      srcSize:= 400 div 4 div bufferSize;//1024*1024*1024 div 4 div bufferSize;
+      srcSize:= 1024*1024*1024 div 4 div bufferSize;
       for i := 1 to srcSize do begin
           for j := 0 to bufferSize-1 do begin
-              //buffer[j] := (1+random(4)) or ((1+random(3)) shl 8) or ((1+random(13)) shl 16) or ((20+random(30)) shl 24);
-              buffer[j] := (1+random(100)) or ((1+random(100)) shl 8) or ((1+random(100)) shl 16) or ((20+random(100)) shl 24);
+              buffer[j] := (1+random(4)) or ((1+random(3)) shl 8) or ((1+random(13)) shl 16) or ((20+random(30)) shl 24);
+              //buffer[j] := (1+random(100)) or ((1+random(100)) shl 8) or ((1+random(100)) shl 16) or ((20+random(100)) shl 24);
               srcSize := srcSize - 1;
-              //buffer[j] := (1) or (2 shl 8);// or (2 shl 8) or (3 shl 16) or (4 shl 24);
-              //buffer[j].corpus := 1 + random(11);
-              //buffer[j].course := 1 + random(4);
-              //buffer[j].region := 20 + random(30);
-
-              //buffer[j].firstname := 'Abacaba';
-              //buffer[j].firstname[1] := Chr(Ord('A') + random(Ord('Z') - Ord('A')));
-              //for k := 2 to 10 do begin
-              //    buffer[j].firstname[k] := Chr(Ord('a') + random(Ord('z') - Ord('a')));
-              //end;
-              //buffer[j].lastname := 'Abacaba';
-              //buffer[j].lastname[1] := Chr(Ord('A') + random(Ord('Z') - Ord('A')));
-              //for k := 2 to 10 do begin
-              //    buffer[j].lastname[k] := Chr(Ord('a') + random(Ord('z') - Ord('a')));
-              //end;
           end;
           BlockWrite(myfile, buffer, bufferSize);
       end;  
@@ -171,22 +159,33 @@ end;
 procedure TForm1.onClickCheck(Sender: TObject);
 begin             
      if not selectedFileName.IsEmpty then begin
-           AssignFile(reader, selectedFileName);
-           Reset(reader);
-           unread := FileSize(reader);
+           readers[0].open(selectedFileName);
+           //AssignFile(reader, selectedFileName);
+           //Reset(reader);
+           unread := readers[0].incoming;//FileSize(reader);
 
-           Read(reader, lastElement);
+           //Read(reader, lastElement);
+           lastElement := getField(readers[0].next());
            mystring := 'File is sorted';
 
            for i := 1 to unread-1 do begin
-               Read(reader, element);
-               if getField(lastElement) > getField(element) then begin
-                  mystring := 'File is unsorted';
+               //Read(reader, element);
+               element := getField(readers[0].next());
+               if lastElement > element then begin
+                  Str(i, tmpstring);
+                  mystring := 'File is unsorted at ' + tmpstring;
+                  Str(i div pageSize, tmpstring);
+                  mystring := mystring + ' - page ' + tmpstring;
+                  Str(lastElement, tmpstring);
+                  mystring := mystring + ' ' + tmpstring;
+                  Str(element, tmpstring);
+                  mystring := mystring + ' > ' + tmpstring;
                   break;
                end;
                lastElement := element;
            end;
-           CloseFile(reader);  
+           //CloseFile(reader);
+           readers[0].close();
            linesList := TStringList.Create;
            linesList.add(mystring);
            Form1.fileViewer.Lines.Assign(linesList);
@@ -235,9 +234,6 @@ end;
 
 procedure TForm1.onClickSort(Sender: TObject);
 begin
-      linesList := TStringList.Create;
-      linesList.add('start');
-
      if not selectedFileName.IsEmpty then begin
           AssignFile(src, selectedFileName);
           Reset(src);
@@ -256,7 +252,6 @@ begin
           srcSize := FileSize(src);
                 
           Form1.Caption := 'Sorting';
-          linesList.add('Sorting');
           while unread > 0 do begin
 		readSize := unread;
 		if readSize > bufferSize then readSize := bufferSize;
@@ -288,12 +283,6 @@ begin
                 availableElements[0] := readers[0].incoming;
                 availableElements[1] := readers[1].incoming;
                 writerId := 0;
-
-                // Debug
-                str(k, tmpstring);
-                Form1.Caption := tmpstring;
-                str(k, tmpstring);
-                linesList.add('k = ' + tmpstring);
 
                 while(availableElements[0] > 0) or (availableElements[1] > 0) do begin
                     s0 := availableElements[0];
@@ -328,12 +317,16 @@ begin
                     i := 0;
 
                     if (s0 > 0) and (s1 > 0) then begin
-                        while true do begin
-                            i := Ord(getField(elements[0]) > getField(elements[1]));
+                        while true do begin 
+                            if getField(elements[0]) <= getField(elements[1]) then begin
+                                i := 0;
+                            end else begin
+                                i := 1;
+                            end;
                             writers[writerId].write(elements[i]);
                             if sizes[i] = 0 then break;
                             elements[i] := readers[i].next();
-                            Dec(sizes[i]);
+                            sizes[i] := sizes[i] - 1;
                         end;
                         i := 1 - i;
                     end else begin
@@ -368,13 +361,10 @@ begin
           unread := readers[0].incoming;
           for i := 0 to unread-1 do begin
               writers[0].write(readers[0].next());
-          end;
-                          ;
+          end;           ;
           writers[0].close();
           readers[0].close();
      end;
-     Form1.fileViewer.Lines.Assign(linesList);
-     linesList.Free;
      selectedFileName := 'out.bin';
      showPage();
 end;
@@ -396,35 +386,39 @@ end;
 
 
 procedure showPage();
+var lastPage:longint;
 begin                            
  Val(Form1.pageInput.Text, page, tmpcode);
- if not selectedFileName.IsEmpty then begin
-      if page < 1 then page := 1;
+ if not selectedFileName.IsEmpty then begin 
       page := page - 1;
+      if page < 0 then page := 0;
       AssignFile(myfile, selectedFileName); 
       reset(myfile);
       totalElements := FileSize(myfile);
+      lastPage := totalElements div pageSize;
+      if totalElements mod pageSize = 0 then lastPage := lastPage - 1;
 
-      if page > totalElements div pageSize then page := totalElements div pageSize;
+      if page > lastPage then page := lastPage;
 
       visibleElements := pageSize;
-      if page = totalElements div pageSize then visibleElements := totalElements mod pageSize;
+      if page = lastPage then visibleElements := totalElements mod pageSize;
+                         
+      linesList := TStringList.Create;
 
       Seek(myfile, page*pageSize);
       BlockRead(myfile, buffer, visibleElements);
 
-      linesList := TStringList.Create;
       for j := 0 to visibleElements-1 do begin  
           str(page*pageSize + j + 1, mystring);
           str(totalElements, tmpstring);
           mystring := mystring + '/' + tmpstring;
-          str(buffer[j] and 255, tmpstring);
+          str(getFieldMode(buffer[j], 0), tmpstring);
           mystring := mystring + ') group=' + tmpstring;
-          str((buffer[j] shr 8) and 255, tmpstring);
+          str(getFieldMode(buffer[j], 1) and 255, tmpstring);
           mystring := mystring + ', course=' + tmpstring;
-          str((buffer[j] shr 16) and 255, tmpstring);
+          str(getFieldMode(buffer[j], 2) and 255, tmpstring);
           mystring := mystring + ', corpus=' + tmpstring;
-          str((buffer[j] shr 24) and 255, tmpstring);
+          str(getFieldMode(buffer[j], 3) and 255, tmpstring);
           mystring := mystring + ', region=' + tmpstring;
           linesList.Add(mystring);
       end;
