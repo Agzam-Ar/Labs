@@ -160,16 +160,11 @@ procedure TForm1.onClickCheck(Sender: TObject);
 begin             
      if not selectedFileName.IsEmpty then begin
            readers[0].open(selectedFileName);
-           //AssignFile(reader, selectedFileName);
-           //Reset(reader);
-           unread := readers[0].incoming;//FileSize(reader);
-
-           //Read(reader, lastElement);
+           unread := readers[0].incoming;
            lastElement := getField(readers[0].next());
            mystring := 'File is sorted';
 
            for i := 1 to unread-1 do begin
-               //Read(reader, element);
                element := getField(readers[0].next());
                if lastElement > element then begin
                   Str(i, tmpstring);
@@ -184,7 +179,6 @@ begin
                end;
                lastElement := element;
            end;
-           //CloseFile(reader);
            readers[0].close();
            linesList := TStringList.Create;
            linesList.add(mystring);
@@ -276,6 +270,7 @@ begin
           k := 1;
 
           while bufferSize*k < srcSize do begin
+                //break;
                 readers[0].open(chunks[0 + chunk]);
                 readers[1].open(chunks[1 + chunk]);
                 writers[0].open(chunks[2 - chunk]);
@@ -353,7 +348,7 @@ begin
                 readers[0].close();
                 readers[1].close();
                 chunk := 2 - chunk;
-                k := k + 1;
+                k := k * 2;
           end;
           Form1.Caption := 'copying';
           writers[0].open('out.bin');
@@ -361,7 +356,7 @@ begin
           unread := readers[0].incoming;
           for i := 0 to unread-1 do begin
               writers[0].write(readers[0].next());
-          end;           ;
+          end;
           writers[0].close();
           readers[0].close();
      end;
