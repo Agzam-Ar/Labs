@@ -237,14 +237,6 @@ procedure TForm1.onClickSort(Sender: TObject);
 begin
       linesList := TStringList.Create;
       linesList.add('start');
-      //for j := 0 to visibleElements-1 do begin
-      //    str(buffer[j], mystring);
-      //    str(page*pageSize + j + 1, tmpstring);
-      //    mystring := tmpstring + ') ' + mystring;
-      //    str(totalElements, tmpstring);
-      //    mystring := mystring + ' of ' + tmpstring;
-      //    linesList.Add(mystring);
-      //end;
 
      if not selectedFileName.IsEmpty then begin
           AssignFile(src, selectedFileName);
@@ -257,10 +249,6 @@ begin
 
           writers[0].open(chunks[0]);
           writers[1].open(chunks[1]);
-          //AssignFile(writers[0], chunks[0]);
-          //AssignFile(writers[1], chunks[1]);
-          //Rewrite(writers[0]);
-          //Rewrite(writers[1]);
 
           chunk := 0;
 
@@ -273,14 +261,14 @@ begin
 		readSize := unread;
 		if readSize > bufferSize then readSize := bufferSize;
                 BlockRead(src, buffer, readSize);
-                            
+
+                // Debug
                 str(unread, mystring);
                 str(readSize, tmpstring);
                 Form1.Caption := 'Sorting ' + mystring + ' -> ' + tmpstring;
 
 		QSort(0, readSize-1);
                 BlockWrite(writers[chunk].fi, buffer, readSize);
-                //writers[chunk].close();
 		chunk := 1 - chunk;
 		unread := unread - readSize;
           end;
@@ -290,52 +278,22 @@ begin
           CloseFile(src);
              
           chunk := 0;
-
           k := 1;
 
-          //mystring:= '';
-          //mystring:= mystring + tmpstring;
-          //str(srcSize, tmpstring);
-          //mystring:= mystring + '/' + tmpstring;
-
-          //bufferSize
-
-          //str(bufferSize*k, tmpstring);
-          //str(srcSize, mystring);
-          //linesList.add(tmpstring + ' < ' + mystring);
-
           while bufferSize*k < srcSize do begin
-          	///AssignFile(readers[0].fi, chunks[0 + chunk]);
-          	//AssignFile(readers[1].fi, chunks[1 + chunk]);
                 readers[0].open(chunks[0 + chunk]);
                 readers[1].open(chunks[1 + chunk]);
-
-                //break;
-          	//AssignFile(readers[0], chunks[0 + chunk]);
-          	//AssignFile(readers[1], chunks[1 + chunk]);
                 writers[0].open(chunks[2 - chunk]);
                 writers[1].open(chunks[3 - chunk]);
-          	//AssignFile(writers[0], chunks[2 - chunk]);
-          	//AssignFile(writers[1], chunks[3 - chunk]);
-                //Reset(readers[0]);
-                //Reset(readers[1]);
-                //Rewrite(writers[0]);
-                //Rewrite(writers[1]);
-                availableElements[0] := readers[0].incoming;// FileSize(readers[0].fi);
-                availableElements[1] := readers[1].incoming;//FileSize(readers[1].fi);
+                availableElements[0] := readers[0].incoming;
+                availableElements[1] := readers[1].incoming;
                 writerId := 0;
 
-                                   
-                    //mystring := '';
+                // Debug
                 str(k, tmpstring);
-                //mystring := mystring + tmpstring;
                 Form1.Caption := tmpstring;
-
                 str(k, tmpstring);
                 linesList.add('k = ' + tmpstring);
-
-                    //mystring := mystring + ' ' + tmpstring;
-                //linesList.add('to ' + chunks[3 - chunk] + ' and ' + chunks[2 - chunk]);
 
                 while(availableElements[0] > 0) or (availableElements[1] > 0) do begin
                     s0 := availableElements[0];
@@ -348,22 +306,13 @@ begin
                          s1 := bufferSize*k;
                     end;
 
+                    // Debug
                     str(k, mystring);       
                     str(srcSize div bufferSize, tmpstring);
                     mystring := mystring + '/' + tmpstring;
                     str(availableElements[0] + availableElements[1], tmpstring);
                     mystring := mystring + ': ' + tmpstring;
-                    //str(availableElements[1], tmpstring);
-                    //mystring := mystring + '/' + tmpstring;
                     Form1.Caption := mystring;
-
-                    //mystring := '';
-                    //str(s0, tmpstring);
-                    //mystring := mystring + tmpstring;
-                    //str(s1, tmpstring);
-                    //mystring := mystring + ' ' + tmpstring;
-                    //linesList.Add(mystring);
-
 
                     sizes[0] := s0;
                     sizes[1] := s1;
@@ -380,32 +329,10 @@ begin
 
                     if (s0 > 0) and (s1 > 0) then begin
                         while true do begin
-                            //str(k, mystring);
-                            //str(availableElements[0], tmpstring);
-                            //mystring := mystring + ': ' + tmpstring;
-                            //str(availableElements[1], tmpstring);
-                            //mystring := mystring + '/' + tmpstring;
-                            //str(sizes[0], tmpstring);
-                            //mystring := mystring + ' -> ' + tmpstring;
-                            //str(sizes[1], tmpstring);
-                            //mystring := mystring + '/' + tmpstring;
-                            //Form1.Caption := mystring;
-
-                            //if getField(elements[0]) <= getField(elements[1]) then begin
-
-                            //if elements[0] <= elements[1] then begin
-                            //    i := 0;
-                            //end else begin
-                            //    i := 1;
-                            //end; 
                             i := Ord(getField(elements[0]) > getField(elements[1]));
                             writers[writerId].write(elements[i]);
-                            //BlockWrite(writers[writerId], elements[i], 1);
-                            //Write(writers[writerId], elements[i]);
                             if sizes[i] = 0 then break;
                             elements[i] := readers[i].next();
-                            //BlockRead(readers[i], elements[i], 1);
-                            //Read(readers[i], elements[i]);
                             Dec(sizes[i]);
                         end;
                         i := 1 - i;
@@ -416,50 +343,30 @@ begin
                             i := 0;
                         end;
                     end;
-
                     while true do begin
-                        //Write(writers[writerId], elements[i]); 
                         writers[writerId].write(elements[i]);
                         if sizes[i] = 0 then begin
                            break;
                         end;
                         elements[i] := readers[i].next();
-                        //Read(readers[i], elements[i]);
                         sizes[i] := sizes[i] - 1;
                     end;
 		    availableElements[0] := availableElements[0] - s0;
 		    availableElements[1] := availableElements[1] - s1;
 		    writerId := 1 - writerId;
                 end;
-
-                //CloseFile(writers[0]);
-                //CloseFile(writers[1]);
-                //CloseFile(readers[0]);
-                //CloseFile(readers[1]);
                 writers[0].close();
                 writers[1].close();
                 readers[0].close();
                 readers[1].close();
-
-
                 chunk := 2 - chunk;
                 k := k + 1;
           end;
           Form1.Caption := 'copying';
-
           writers[0].open('out.bin');
           readers[0].open(chunks[0]);
-          //AssignFile(writer, 'out.bin');
-          //AssignFile(reader, chunks[2-chunk]);
-
-          //Reset(reader);
-          //Rewrite(writer);
-
-          unread := readers[0].incoming;//FileSize(reader);
-
+          unread := readers[0].incoming;
           for i := 0 to unread-1 do begin
-              //Read(reader, element);
-              //Write(writer, element);
               writers[0].write(readers[0].next());
           end;
                           ;
@@ -512,7 +419,6 @@ begin
           str(totalElements, tmpstring);
           mystring := mystring + '/' + tmpstring;
           str(buffer[j] and 255, tmpstring);
-          //str(buffer[j], tmpstring);
           mystring := mystring + ') group=' + tmpstring;
           str((buffer[j] shr 8) and 255, tmpstring);
           mystring := mystring + ', course=' + tmpstring;
@@ -520,9 +426,6 @@ begin
           mystring := mystring + ', corpus=' + tmpstring;
           str((buffer[j] shr 24) and 255, tmpstring);
           mystring := mystring + ', region=' + tmpstring;
-          //str(mode, tmpstring);
-          //mystring := mystring + 'mode=' + tmpstring;
-
           linesList.Add(mystring);
       end;
       Form1.fileViewer.Lines.Assign(linesList);
