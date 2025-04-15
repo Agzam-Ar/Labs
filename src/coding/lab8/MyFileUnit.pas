@@ -58,7 +58,7 @@ begin
      end;
       
      next := buffer[index];
-     //index := index + 1;
+     index := index + 1;
 end;
 procedure MyReader.close();
 begin
