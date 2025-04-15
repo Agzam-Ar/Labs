@@ -9,7 +9,7 @@ uses
  
 
 const
-  bufferSize = 256 * 1024;//1024 * 512;//64;// * ;
+  bufferSize = 1024 * 1024 * 16;//1024 * 512;//64;// * ;
   pageSize = 20;
 
 type
@@ -83,7 +83,7 @@ var
   src : file of user;
   srcSize : longint;
   chunks : array[0..3] of string;
-  writers: array[0..1] of file of user;
+  writers: array[0..1] of MyWriter;//file of user;
   readers: array[0..1] of MyReader;
   //readers: array[0..1] of file of user;
   reader: file of user;
@@ -99,8 +99,10 @@ var
   elements: array[0..1] of user;
   element : user;
   lastElement : user;
-  sortTmp : user;
 
+  sortTmp : user;
+  sortPivot : longint;
+  sortIndex : longint;
 
 
   //chunkFiles: file of longint;
@@ -129,7 +131,7 @@ begin
       srcSize:= 1024*1024*1024 div 4 div bufferSize;
       for i := 1 to srcSize do begin
           for j := 0 to bufferSize-1 do begin
-              buffer[j] := (1+random(4)) or ((1+random(3)) shl 8) or ((1+random(13)) shl 16) or ((20+random(30)) shl 24);
+              buffer[j] := random(1000000);//(1+random(4)) or ((1+random(3)) shl 8) or ((1+random(13)) shl 16) or ((20+random(30)) shl 24);
               //buffer[j] := (1) or (2 shl 8);// or (2 shl 8) or (3 shl 16) or (4 shl 24);
               //buffer[j].corpus := 1 + random(11);
               //buffer[j].course := 1 + random(4);
@@ -198,50 +200,93 @@ begin
  linesList:=TStringList.Create;
  Form1.fileViewer.Lines.Assign(linesList);
  Form1.Caption := '';
+ readers[0] := MyReader.Create;
+ readers[1] := MyReader.Create;
+ writers[0] := MyWriter.Create;
+ writers[1] := MyWriter.Create;
 end;
 
 
+//procedure sortBuffer(l, r:longint);
+//procedure sortBuffer(n:longint);
+//var i, j, pivot, tmp: Integer;
+//begin
+     //if l < r then begin
+     //   sortPivot := buffer[(l+r) div 2];
+     //   i := l;
+     //   j := r;
+     //   repeat
+     //         while buffer[i] < sortPivot do Inc(i);
+     //         while buffer[J] > sortPivot do Dec(J);
+     //         if i <= j then begin
+     //            sortTmp := buffer[i];
+     //            buffer[i] := buffer[j];
+     //            buffer[j] := sortTmp;
+     //            Inc(i);
+     //            Dec(j);
+     //         end;
+     //   until i > j;
+     //   sortBuffer(l, j);
+     //   sortBuffer(i, r);
+     //end;
+      //if r - l <= 16 then begin
 
-procedure sortBuffer(low, high:longint);
-begin 
-      if low < high then begin
-         k := buffer[high];
-         i := low - 1;
-         for j := low to high - 1 do begin
-             if buffer[j] < k then begin
-                i := i + 1;
-                sortTmp := buffer[i];
-                buffer[i] := buffer[j];
-                buffer[j] := sortTmp;
-             end;
-         end;    
-         i := i + 1;
-         sortTmp := buffer[i];
-         buffer[i] := buffer[j];
-         buffer[j] := sortTmp;
-         sortBuffer(low, i - 1);
-         sortBuffer(i + 1, high);
-      end;
+         //for i := l to r-1 do begin
+         //    current := buffer[i];
+         //    j := i - 1;
+         //    while (j >= l) and (getField(current) - getField(buffer[j]) <= 0) do begin
+         //          buffer[j + 1] := buffer[j];
+         //          j := j - 1;
+         //    end;
+         //    buffer[j + 1] := current;
+         //end;
+      //end else if l < r then begin
+      //   pivot := buffer[r];
+      //   i := l - 1;
+      //   for j := l to r - 1 do begin
+      //       if buffer[j] <= pivot then begin
+      //          i := i + 1;
+      //          tmp := buffer[i];
+      //          buffer[i] := buffer[j];
+      //          buffer[j] := tmp;
+      //       end;
+      //   end;
+      //   //i := i + 1;
+      //   tmp := buffer[i+1];
+      //   buffer[i+1] := buffer[r];
+      //   buffer[r] := tmp;
+      //   //sortIndex := i;
+      //   sortBuffer(l, i);
+      //   sortBuffer(i+2, r);
+      //end;
+//end;
 
-
-    //for i := 0 to n-1 do begin
-    //    for j := i to n-1 do begin
-    //        if buffer[j] < buffer[i] then begin
-    //              current := buffer[i];
-    //              buffer[i] := buffer[j];
-    //              buffer[j] := current;
-    //        end;
-    //    end;
-    //end;
-    //for i := 0 to n-1 do begin
-    //    current := buffer[i];
-    //    j := i - 1;
-    //    while (j >= 0) and (getField(current) - getField(buffer[j]) <= 0) do begin
-    //        buffer[j + 1] := buffer[j];
-    //        j := j - 1;
-    //    end;
-    //    buffer[j + 1] := current;
-    //end;
+procedure QSort ( first, last: longint);
+var L, R, c, X: longint;
+begin
+   if first < last then
+   begin
+      X:= buffer[(first + last) div 2];
+      L:= first;
+      R:= last;
+         while L <= R do
+         begin
+            while buffer[L] < X do
+               L:= L + 1;
+            while buffer[R] > X do
+               R:= R - 1;
+            if L <= R then
+            begin
+               c:= buffer[L];
+               buffer[L]:= buffer[R];
+               buffer[R]:= c;
+               L:= L + 1;
+               R:= R - 1;
+            end;
+        end;
+     QSort(first, R);
+     QSort(L, last);
+  end;
 end;
 
 procedure TForm1.onClickSort(Sender: TObject);
@@ -265,10 +310,12 @@ begin
           chunks[2] := selectedFileName + '.2';
           chunks[3] := selectedFileName + '.3';
 
-          AssignFile(writers[0], chunks[0]);
-          AssignFile(writers[1], chunks[1]);
-          Rewrite(writers[0]);
-          Rewrite(writers[1]);
+          writers[0].open(chunks[0]);
+          writers[1].open(chunks[1]);
+          //AssignFile(writers[0], chunks[0]);
+          //AssignFile(writers[1], chunks[1]);
+          //Rewrite(writers[0]);
+          //Rewrite(writers[1]);
 
           chunk := 0;
 
@@ -280,14 +327,20 @@ begin
 		readSize := unread;
 		if readSize > bufferSize then readSize := bufferSize;
                 BlockRead(src, buffer, readSize);
-		//sortBuffer(0, readSize);
-                BlockWrite(writers[chunk], buffer, readSize);
+                            
+                str(unread, mystring);
+                str(readSize, tmpstring);
+                Form1.Caption := 'Sorting ' + mystring + ' -> ' + tmpstring;
+
+		QSort(0, readSize-1);
+                BlockWrite(writers[chunk].fi, buffer, readSize);
+                writers[chunk].close();
 		chunk := 1 - chunk;
 		unread := unread - readSize;
           end;
-                        
-          CloseFile(writers[0]);
-          CloseFile(writers[1]);
+
+          writers[0].close();
+          writers[1].close();
           CloseFile(src);
              
           chunk := 0;
@@ -302,16 +355,24 @@ begin
 
           //bufferSize
           while bufferSize*k < srcSize do begin
-          	AssignFile(readers[0], chunks[0 + chunk]);
-          	AssignFile(readers[1], chunks[1 + chunk]);
-          	AssignFile(writers[0], chunks[2 - chunk]);
-          	AssignFile(writers[1], chunks[3 - chunk]);
-                Reset(readers[0]);
-                Reset(readers[1]);
-                Rewrite(writers[0]);
-                Rewrite(writers[1]);
-                availableElements[0] := FileSize(readers[0]);
-                availableElements[1] := FileSize(readers[1]);
+          	///AssignFile(readers[0].fi, chunks[0 + chunk]);
+          	//AssignFile(readers[1].fi, chunks[1 + chunk]);
+                readers[0].open(chunks[0 + chunk]);
+                readers[1].open(chunks[1 + chunk]);
+
+                //break;
+          	//AssignFile(readers[0], chunks[0 + chunk]);
+          	//AssignFile(readers[1], chunks[1 + chunk]);
+                writers[0].open(chunks[2 - chunk]);
+                writers[1].open(chunks[3 - chunk]);
+          	//AssignFile(writers[0], chunks[2 - chunk]);
+          	//AssignFile(writers[1], chunks[3 - chunk]);
+                //Reset(readers[0]);
+                //Reset(readers[1]);
+                //Rewrite(writers[0]);
+                //Rewrite(writers[1]);
+                availableElements[0] := readers[0].incoming;// FileSize(readers[0].fi);
+                availableElements[1] := readers[1].incoming;//FileSize(readers[1].fi);
                 writerId := 0;
 
                                    
@@ -335,7 +396,9 @@ begin
                          s1 := bufferSize*k;
                     end;
 
-                    str(k, mystring);
+                    str(k, mystring);       
+                    str(srcSize div bufferSize, tmpstring);
+                    mystring := mystring + '/' + tmpstring;
                     str(availableElements[0] + availableElements[1], tmpstring);
                     mystring := mystring + ': ' + tmpstring;
                     //str(availableElements[1], tmpstring);
@@ -356,8 +419,9 @@ begin
                     for i := 0 to 1 do begin
                         if sizes[i] = 0 then begin
                              continue;
-                        end; 
-                        Read(readers[i], elements[i]);
+                        end;
+                        elements[i] := readers[i].next();
+                        //Read(readers[i], elements[i]);
                         sizes[i] := sizes[i] - 1;
                     end;
 
@@ -384,10 +448,12 @@ begin
                             //    i := 1;
                             //end; 
                             i := Ord(elements[0] > elements[1]);
-                            BlockWrite(writers[writerId], elements[i], 1);
+                            writers[writerId].write(elements[i]);
+                            //BlockWrite(writers[writerId], elements[i], 1);
                             //Write(writers[writerId], elements[i]);
-                            if sizes[i] = 0 then break;  
-                            BlockRead(readers[i], elements[i], 1);
+                            if sizes[i] = 0 then break;
+                            elements[i] := readers[i].next();
+                            //BlockRead(readers[i], elements[i], 1);
                             //Read(readers[i], elements[i]);
                             Dec(sizes[i]);
                         end;
@@ -401,11 +467,13 @@ begin
                     end;
 
                     while true do begin
-                        Write(writers[writerId], elements[i]);
+                        //Write(writers[writerId], elements[i]); 
+                        writers[writerId].write(elements[i]);
                         if sizes[i] = 0 then begin
                            break;
                         end;
-                        Read(readers[i], elements[i]);
+                        elements[i] := readers[i].next();
+                        //Read(readers[i], elements[i]);
                         sizes[i] := sizes[i] - 1;
                     end;
 		    availableElements[0] := availableElements[0] - s0;
@@ -413,30 +481,39 @@ begin
 		    writerId := 1 - writerId;
                 end;
 
-                CloseFile(writers[0]);
-                CloseFile(writers[1]);
-                CloseFile(readers[0]);
-                CloseFile(readers[1]);
+                //CloseFile(writers[0]);
+                //CloseFile(writers[1]);
+                //CloseFile(readers[0]);
+                //CloseFile(readers[1]);
+                writers[0].close();
+                writers[1].close();
+                readers[0].close();
+                readers[1].close();
+
 
                 chunk := 2 - chunk;
                 k := k + 1;
           end;
+          Form1.Caption := 'copying';
 
-          AssignFile(writer, 'out.bin');
-          AssignFile(reader, chunks[2-chunk]);
+          writers[0].open('out.bin');
+          readers[0].open(chunks[3-chunk]);
+          //AssignFile(writer, 'out.bin');
+          //AssignFile(reader, chunks[2-chunk]);
 
-          Reset(reader);
-          Rewrite(writer);
+          //Reset(reader);
+          //Rewrite(writer);
 
-          unread := FileSize(reader);
+          unread := readers[0].incoming;//FileSize(reader);
 
           for i := 0 to unread-1 do begin
-              Read(reader, element);
-              Write(writer, element);
+              //Read(reader, element);
+              //Write(writer, element);
+              writers[0].write(readers[0].next());
           end;
-
-          CloseFile(writer);
-          CloseFile(reader);
+                          ;
+          writers[0].close();
+          readers[0].close();
      end;
      //Form1.fileViewer.Lines.Assign(linesList);
      //linesList.Free;
@@ -483,7 +560,8 @@ begin
           str(page*pageSize + j + 1, mystring);
           str(totalElements, tmpstring);
           mystring := mystring + '/' + tmpstring;
-          str(buffer[j] and 255, tmpstring);
+          //str(buffer[j] and 255, tmpstring);
+          str(buffer[j], tmpstring);
           mystring := mystring + ') group=' + tmpstring;
           str((buffer[j] shr 8) and 255, tmpstring);
           mystring := mystring + ', course=' + tmpstring;

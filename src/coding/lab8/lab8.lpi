@@ -45,7 +45,7 @@
       <Unit>
         <Filename Value="myfile.pas"/>
         <IsPartOfProject Value="True"/>
-        <UnitName Value="MyFile"/>
+        <UnitName Value="MyFileUnit"/>
       </Unit>
     </Units>
   </ProjectOptions>
