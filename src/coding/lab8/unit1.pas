@@ -9,7 +9,7 @@ uses
  
 
 const
-  bufferSize = 1024 * 1024 * 16;//1024 * 512;//64;// * ;
+  bufferSize = 20;//1024 * 1024 * 16;
   pageSize = 20;
 
 type
@@ -128,10 +128,12 @@ begin
       Rewrite(myfile);
       //CloseFile(myfile);
       //
-      srcSize:= 1024*1024*1024 div 4 div bufferSize;
+      srcSize:= 400 div 4 div bufferSize;//1024*1024*1024 div 4 div bufferSize;
       for i := 1 to srcSize do begin
           for j := 0 to bufferSize-1 do begin
-              buffer[j] := random(1000000);//(1+random(4)) or ((1+random(3)) shl 8) or ((1+random(13)) shl 16) or ((20+random(30)) shl 24);
+              //buffer[j] := (1+random(4)) or ((1+random(3)) shl 8) or ((1+random(13)) shl 16) or ((20+random(30)) shl 24);
+              buffer[j] := (1+random(100)) or ((1+random(100)) shl 8) or ((1+random(100)) shl 16) or ((20+random(100)) shl 24);
+              srcSize := srcSize - 1;
               //buffer[j] := (1) or (2 shl 8);// or (2 shl 8) or (3 shl 16) or (4 shl 24);
               //buffer[j].corpus := 1 + random(11);
               //buffer[j].course := 1 + random(4);
@@ -162,9 +164,6 @@ begin
  if openDialog.Execute then begin
       selectedFileName := openDialog.FileName;
       Form1.Caption := selectedFileName;
-      //AssignFile(myfile, selectedFileName);
-                     
-      //CloseFile(myfile);
       showPage();
  end;
 end;
@@ -206,74 +205,19 @@ begin
  writers[1] := MyWriter.Create;
 end;
 
-
-//procedure sortBuffer(l, r:longint);
-//procedure sortBuffer(n:longint);
-//var i, j, pivot, tmp: Integer;
-//begin
-     //if l < r then begin
-     //   sortPivot := buffer[(l+r) div 2];
-     //   i := l;
-     //   j := r;
-     //   repeat
-     //         while buffer[i] < sortPivot do Inc(i);
-     //         while buffer[J] > sortPivot do Dec(J);
-     //         if i <= j then begin
-     //            sortTmp := buffer[i];
-     //            buffer[i] := buffer[j];
-     //            buffer[j] := sortTmp;
-     //            Inc(i);
-     //            Dec(j);
-     //         end;
-     //   until i > j;
-     //   sortBuffer(l, j);
-     //   sortBuffer(i, r);
-     //end;
-      //if r - l <= 16 then begin
-
-         //for i := l to r-1 do begin
-         //    current := buffer[i];
-         //    j := i - 1;
-         //    while (j >= l) and (getField(current) - getField(buffer[j]) <= 0) do begin
-         //          buffer[j + 1] := buffer[j];
-         //          j := j - 1;
-         //    end;
-         //    buffer[j + 1] := current;
-         //end;
-      //end else if l < r then begin
-      //   pivot := buffer[r];
-      //   i := l - 1;
-      //   for j := l to r - 1 do begin
-      //       if buffer[j] <= pivot then begin
-      //          i := i + 1;
-      //          tmp := buffer[i];
-      //          buffer[i] := buffer[j];
-      //          buffer[j] := tmp;
-      //       end;
-      //   end;
-      //   //i := i + 1;
-      //   tmp := buffer[i+1];
-      //   buffer[i+1] := buffer[r];
-      //   buffer[r] := tmp;
-      //   //sortIndex := i;
-      //   sortBuffer(l, i);
-      //   sortBuffer(i+2, r);
-      //end;
-//end;
-
 procedure QSort ( first, last: longint);
 var L, R, c, X: longint;
 begin
    if first < last then
    begin
-      X:= buffer[(first + last) div 2];
+      X:= getField(buffer[(first + last) div 2]);
       L:= first;
       R:= last;
          while L <= R do
          begin
-            while buffer[L] < X do
+            while getField(buffer[L]) < X do
                L:= L + 1;
-            while buffer[R] > X do
+            while getField(buffer[R]) > X do
                R:= R - 1;
             if L <= R then
             begin
@@ -291,7 +235,8 @@ end;
 
 procedure TForm1.onClickSort(Sender: TObject);
 begin
-      //linesList := TStringList.Create;
+      linesList := TStringList.Create;
+      linesList.add('start');
       //for j := 0 to visibleElements-1 do begin
       //    str(buffer[j], mystring);
       //    str(page*pageSize + j + 1, tmpstring);
@@ -323,6 +268,7 @@ begin
           srcSize := FileSize(src);
                 
           Form1.Caption := 'Sorting';
+          linesList.add('Sorting');
           while unread > 0 do begin
 		readSize := unread;
 		if readSize > bufferSize then readSize := bufferSize;
@@ -334,7 +280,7 @@ begin
 
 		QSort(0, readSize-1);
                 BlockWrite(writers[chunk].fi, buffer, readSize);
-                writers[chunk].close();
+                //writers[chunk].close();
 		chunk := 1 - chunk;
 		unread := unread - readSize;
           end;
@@ -348,12 +294,16 @@ begin
           k := 1;
 
           //mystring:= '';
-          //str(bufferSize*k, tmpstring);
           //mystring:= mystring + tmpstring;
           //str(srcSize, tmpstring);
           //mystring:= mystring + '/' + tmpstring;
 
           //bufferSize
+
+          //str(bufferSize*k, tmpstring);
+          //str(srcSize, mystring);
+          //linesList.add(tmpstring + ' < ' + mystring);
+
           while bufferSize*k < srcSize do begin
           	///AssignFile(readers[0].fi, chunks[0 + chunk]);
           	//AssignFile(readers[1].fi, chunks[1 + chunk]);
@@ -380,9 +330,11 @@ begin
                 str(k, tmpstring);
                 //mystring := mystring + tmpstring;
                 Form1.Caption := tmpstring;
-                    //str(s1, tmpstring);
+
+                str(k, tmpstring);
+                linesList.add('k = ' + tmpstring);
+
                     //mystring := mystring + ' ' + tmpstring;
-                //linesList.add('merge ' + chunks[0 + chunk] + ' and ' + chunks[1 + chunk]);
                 //linesList.add('to ' + chunks[3 - chunk] + ' and ' + chunks[2 - chunk]);
 
                 while(availableElements[0] > 0) or (availableElements[1] > 0) do begin
@@ -421,7 +373,6 @@ begin
                              continue;
                         end;
                         elements[i] := readers[i].next();
-                        //Read(readers[i], elements[i]);
                         sizes[i] := sizes[i] - 1;
                     end;
 
@@ -447,7 +398,7 @@ begin
                             //end else begin
                             //    i := 1;
                             //end; 
-                            i := Ord(elements[0] > elements[1]);
+                            i := Ord(getField(elements[0]) > getField(elements[1]));
                             writers[writerId].write(elements[i]);
                             //BlockWrite(writers[writerId], elements[i], 1);
                             //Write(writers[writerId], elements[i]);
@@ -497,7 +448,7 @@ begin
           Form1.Caption := 'copying';
 
           writers[0].open('out.bin');
-          readers[0].open(chunks[3-chunk]);
+          readers[0].open(chunks[0]);
           //AssignFile(writer, 'out.bin');
           //AssignFile(reader, chunks[2-chunk]);
 
@@ -515,8 +466,8 @@ begin
           writers[0].close();
           readers[0].close();
      end;
-     //Form1.fileViewer.Lines.Assign(linesList);
-     //linesList.Free;
+     Form1.fileViewer.Lines.Assign(linesList);
+     linesList.Free;
      selectedFileName := 'out.bin';
      showPage();
 end;
@@ -560,8 +511,8 @@ begin
           str(page*pageSize + j + 1, mystring);
           str(totalElements, tmpstring);
           mystring := mystring + '/' + tmpstring;
-          //str(buffer[j] and 255, tmpstring);
-          str(buffer[j], tmpstring);
+          str(buffer[j] and 255, tmpstring);
+          //str(buffer[j], tmpstring);
           mystring := mystring + ') group=' + tmpstring;
           str((buffer[j] shr 8) and 255, tmpstring);
           mystring := mystring + ', course=' + tmpstring;

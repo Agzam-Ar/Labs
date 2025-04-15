@@ -10,7 +10,7 @@
         <IsPartOfProject Value="True"/>
         <EditorIndex Value="3"/>
         <CursorPos X="27" Y="13"/>
-        <UsageCount Value="78"/>
+        <UsageCount Value="79"/>
         <Loaded Value="True"/>
       </Unit>
       <Unit>
@@ -21,9 +21,9 @@
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="Unit1"/>
         <IsVisibleTab Value="True"/>
-        <TopLine Value="335"/>
-        <CursorPos Y="356"/>
-        <UsageCount Value="78"/>
+        <TopLine Value="100"/>
+        <CursorPos X="18" Y="121"/>
+        <UsageCount Value="79"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
       </Unit>
@@ -34,7 +34,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="7"/>
         <CursorPos X="79" Y="17"/>
-        <UsageCount Value="25"/>
+        <UsageCount Value="26"/>
       </Unit>
       <Unit>
         <Filename Value="C:\lazarus\lcl\dialogs.pp"/>
@@ -42,7 +42,7 @@
         <EditorIndex Value="7"/>
         <TopLine Value="165"/>
         <CursorPos X="14" Y="174"/>
-        <UsageCount Value="38"/>
+        <UsageCount Value="39"/>
         <Loaded Value="True"/>
       </Unit>
       <Unit>
@@ -50,7 +50,7 @@
         <EditorIndex Value="6"/>
         <TopLine Value="188"/>
         <CursorPos X="19" Y="223"/>
-        <UsageCount Value="37"/>
+        <UsageCount Value="38"/>
         <Loaded Value="True"/>
       </Unit>
       <Unit>
@@ -59,7 +59,7 @@
         <EditorIndex Value="5"/>
         <TopLine Value="923"/>
         <CursorPos X="14" Y="938"/>
-        <UsageCount Value="33"/>
+        <UsageCount Value="34"/>
         <Loaded Value="True"/>
       </Unit>
       <Unit>
@@ -68,7 +68,7 @@
         <EditorIndex Value="4"/>
         <TopLine Value="152"/>
         <CursorPos X="3" Y="174"/>
-        <UsageCount Value="21"/>
+        <UsageCount Value="22"/>
         <Loaded Value="True"/>
       </Unit>
       <Unit>
@@ -76,34 +76,19 @@
         <EditorIndex Value="2"/>
         <TopLine Value="1264"/>
         <CursorPos X="11" Y="1289"/>
-        <UsageCount Value="12"/>
+        <UsageCount Value="13"/>
         <Loaded Value="True"/>
       </Unit>
       <Unit>
         <Filename Value="MyFileUnit.pas"/>
         <EditorIndex Value="1"/>
-        <CursorPos X="54" Y="42"/>
-        <UsageCount Value="12"/>
+        <TopLine Value="25"/>
+        <CursorPos X="6" Y="61"/>
+        <UsageCount Value="13"/>
         <Loaded Value="True"/>
       </Unit>
     </Units>
     <JumpHistory HistoryIndex="29">
-      <Position>
-        <Filename Value="MyFileUnit.pas"/>
-        <Caret Line="21" Column="39"/>
-      </Position>
-      <Position>
-        <Filename Value="MyFileUnit.pas"/>
-        <Caret Line="19" Column="33"/>
-      </Position>
-      <Position>
-        <Filename Value="MyFileUnit.pas"/>
-        <Caret Line="17" Column="25"/>
-      </Position>
-      <Position>
-        <Filename Value="unit1.pas"/>
-        <Caret Line="303" Column="41" TopLine="283"/>
-      </Position>
       <Position>
         <Filename Value="unit1.pas"/>
         <Caret Line="320" Column="50" TopLine="292"/>
@@ -207,6 +192,22 @@
       <Position>
         <Filename Value="unit1.pas"/>
         <Caret Line="586" Column="45" TopLine="551"/>
+      </Position>
+      <Position>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="282" Column="15" TopLine="251"/>
+      </Position>
+      <Position>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="130" Column="29" TopLine="121"/>
+      </Position>
+      <Position>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="164" TopLine="131"/>
+      </Position>
+      <Position>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="471" Column="24" TopLine="434"/>
       </Position>
     </JumpHistory>
     <RunParams>
