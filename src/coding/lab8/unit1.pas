@@ -83,9 +83,8 @@ var
   src : file of user;
   srcSize : longint;
   chunks : array[0..3] of string;
-  writers: array[0..1] of MyWriter;//file of user;
+  writers: array[0..1] of MyWriter;
   readers: array[0..1] of MyReader;
-  //readers: array[0..1] of file of user;
   reader: file of user;
   writer: file of user;
   chunk: longint;     
@@ -135,7 +134,6 @@ begin
       for i := 1 to srcSize do begin
           for j := 0 to bufferSize-1 do begin
               buffer[j] := (1+random(4)) or ((1+random(3)) shl 8) or ((1+random(13)) shl 16) or ((20+random(30)) shl 24);
-              //buffer[j] := (1+random(100)) or ((1+random(100)) shl 8) or ((1+random(100)) shl 16) or ((20+random(100)) shl 24);
               srcSize := srcSize - 1;
           end;
           BlockWrite(myfile, buffer, bufferSize);
@@ -169,10 +167,10 @@ begin
                if lastElement > element then begin
                   Str(i, tmpstring);
                   mystring := 'File is unsorted at ' + tmpstring;
-                  Str(i div pageSize, tmpstring);
-                  mystring := mystring + ' - page ' + tmpstring;
+                  Str((i-1) div pageSize, tmpstring);
+                  mystring := mystring + ' (page ' + tmpstring;
                   Str(lastElement, tmpstring);
-                  mystring := mystring + ' ' + tmpstring;
+                  mystring := mystring + ') ' + tmpstring;
                   Str(element, tmpstring);
                   mystring := mystring + ' > ' + tmpstring;
                   break;
@@ -270,7 +268,6 @@ begin
           k := 1;
 
           while bufferSize*k < srcSize do begin
-                //break;
                 readers[0].open(chunks[0 + chunk]);
                 readers[1].open(chunks[1 + chunk]);
                 writers[0].open(chunks[2 - chunk]);
@@ -350,7 +347,7 @@ begin
                 chunk := 2 - chunk;
                 k := k * 2;
           end;
-          Form1.Caption := 'copying';
+          Form1.Caption := 'Copying';
           writers[0].open('out.bin');
           readers[0].open(chunks[0]);
           unread := readers[0].incoming;
@@ -359,6 +356,7 @@ begin
           end;
           writers[0].close();
           readers[0].close();
+          Form1.Caption := 'Ready';
      end;
      selectedFileName := 'out.bin';
      showPage();
