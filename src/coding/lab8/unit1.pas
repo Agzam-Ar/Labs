@@ -196,31 +196,26 @@ begin
  writers[1] := MyWriter.Create;
 end;
 
-procedure QSort ( first, last: longint);
-var L, R, c, X: longint;
+procedure sort(first, last: longint);
+var l, r, tmp, pi: longint;
 begin
-   if first < last then
-   begin
-      X:= getField(buffer[(first + last) div 2]);
-      L:= first;
-      R:= last;
-         while L <= R do
-         begin
-            while getField(buffer[L]) < X do
-               L:= L + 1;
-            while getField(buffer[R]) > X do
-               R:= R - 1;
-            if L <= R then
-            begin
-               c:= buffer[L];
-               buffer[L]:= buffer[R];
-               buffer[R]:= c;
-               L:= L + 1;
-               R:= R - 1;
+   if first < last then begin
+      pi:= getField(buffer[(first + last) div 2]);
+      l:= first;
+      r:= last;
+      while l <= r do begin
+            while getField(buffer[l]) < pi do l := l + 1;
+            while getField(buffer[r]) > pi do r := r - 1;
+            if l <= r then begin
+               tmp := buffer[l];
+               buffer[l] := buffer[r];
+               buffer[r] := tmp;
+               l := l + 1;
+               r := r - 1;
             end;
-        end;
-     QSort(first, R);
-     QSort(L, last);
+      end;
+      sort(first, r);
+      sort(l, last);
   end;
 end;
 
@@ -254,7 +249,7 @@ begin
                 str(readSize, tmpstring);
                 Form1.Caption := 'Sorting ' + mystring + ' -> ' + tmpstring;
 
-		QSort(0, readSize-1);
+		sort(0, readSize-1);
                 BlockWrite(writers[chunk].fi, buffer, readSize);
 		chunk := 1 - chunk;
 		unread := unread - readSize;
